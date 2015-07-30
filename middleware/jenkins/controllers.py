@@ -4,4 +4,4 @@ from flask.json import jsonify
 
 class Controllers(Resource):
     def post(self):
-        return jsonify(name="Mozão love <3 Mozinho!")
+        return jsonify(name="Test routing.")
