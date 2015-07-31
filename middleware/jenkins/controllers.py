@@ -10,5 +10,4 @@ class Controllers(Resource):
             data = request.get_json()
             return jsonify(JenkinsFacade().create(data))
         except Exception as inst:
-            print(type(inst), inst.args, inst)
-
+            return jsonify({'message': inst.args})

@@ -24,6 +24,10 @@ class Download:
         file = self.__prepare_file(job_name, abstract_name)
 
         response = requests.get(host, stream=True)
+
+        if response.status_code != 200:
+            raise Exception("It was not find the abstract job " + abstract_name + " in gitlab.")
+
         with open(file, 'wb') as f:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:  # filter out keep-alive new chunks
