@@ -18,6 +18,10 @@ class Download:
         :param version:
         :return: the path and file
         '''
+
+        # if version.endswith('*') == True:
+        #     self.get_latest_version(abstract_name, version)
+
         host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
         host = host.format(*[abstract_name, version])
 
@@ -49,3 +53,14 @@ class Download:
             os.mkdir(directory)
 
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
+
+    # def get_latest_version(self, abstract_name, version):
+    #     host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'tag_path')
+    #     host = host.format(*[abstract_name, version])
+    #
+    #     response = requests.get(host)
+    #
+    #     if response.status_code != 200:
+    #         raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
+    #
+    #     print(response.json())
