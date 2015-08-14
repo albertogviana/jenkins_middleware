@@ -5,6 +5,7 @@ import requests
 import tempfile
 import time
 import os
+from json import loads
 
 
 class Download:
@@ -19,8 +20,8 @@ class Download:
         :return: the path and file
         '''
 
-        # if version.endswith('*') == True:
-        #     self.get_latest_version(abstract_name, version)
+        if version.endswith('*'):
+            version = self.get_latest_version(abstract_name)
 
         host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
         host = host.format(*[abstract_name, version])
@@ -54,13 +55,18 @@ class Download:
 
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
-    # def get_latest_version(self, abstract_name, version):
-    #     host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'tag_path')
-    #     host = host.format(*[abstract_name, version])
-    #
-    #     response = requests.get(host)
-    #
-    #     if response.status_code != 200:
-    #         raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
-    #
-    #     print(response.json())
+    def get_latest_version(self, abstract_name):
+        host = configuration.get('gitlab', 'host', raw=True) + '/' + configuration.get('gitlab', 'tag_path', raw=True)
+        private_token = configuration.get('gitlab', 'private_token', raw=True)
+        host = host.format(*[abstract_name, private_token])
+
+        response = requests.get(host)
+
+        if response.status_code != 200:
+            raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
+
+        result = response.json()
+        print(result)
+        for item in result:
+            print(item)
+
