@@ -5,7 +5,6 @@ import requests
 import tempfile
 import time
 import os
-from json import loads
 
 
 class Download:
@@ -28,7 +27,6 @@ class Download:
         host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
         host = host.format(*[abstract_name, version])
 
-        print(host)
         file = self.__prepare_file(job_name, abstract_name)
 
         response = requests.get(host, stream=True)
