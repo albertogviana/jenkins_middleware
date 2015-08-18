@@ -21,11 +21,14 @@ class Download:
         '''
 
         if version.endswith('*'):
-            version = self.get_latest_version(abstract_name)
+            latest_version = self.get_latest_version(abstract_name)
+            if latest_version is not None:
+                version = latest_version
 
         host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
         host = host.format(*[abstract_name, version])
 
+        print(host)
         file = self.__prepare_file(job_name, abstract_name)
 
         response = requests.get(host, stream=True)
@@ -56,6 +59,11 @@ class Download:
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
     def get_latest_version(self, abstract_name):
+        '''
+        Get latest version on gitlab
+        :param abstract_name: string
+        :return: string | boolean
+        '''
         host = configuration.get('gitlab', 'host', raw=True) + '/' + configuration.get('gitlab', 'tag_path', raw=True)
         private_token = configuration.get('gitlab', 'private_token', raw=True)
         host = host.format(*[abstract_name, private_token])
@@ -66,7 +74,9 @@ class Download:
             raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
 
         result = response.json()
-        print(result)
-        for item in result:
-            print(item)
+        # Get the first element
+        first_element = result.pop(0)
+        if 'name' not in first_element:
+            return None
 
+        return first_element["name"]
