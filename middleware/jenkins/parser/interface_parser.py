@@ -1,6 +1,3 @@
-__author__ = 'aguimaraesviana'
-
-
 class InterfaceParser:
     def get_placeholder(self, placeholder_name):
         raise NotImplementedError()

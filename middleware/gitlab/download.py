@@ -11,13 +11,13 @@ class Download:
     FILE_EXTENSION = '.tar.gz'
 
     def get_archieve(self, job_name, abstract_name, version):
-        '''
+        """
         Get the archieve on gitlab
         :param job_name:
         :param abstract_name:
         :param version:
         :return: the path and file
-        '''
+        """
 
         if version.endswith('*'):
             latest_version = self.get_latest_version(abstract_name)
@@ -43,12 +43,12 @@ class Download:
         return file
 
     def __prepare_file(self, job_name, abstract_name):
-        '''
+        """
         Create a directory and prepare file
         :param job_name: job name
         :param abstract_name: abstract name
         :return: the directory path and the filename
-        '''
+        """
         directory = os.path.join(tempfile.gettempdir(), job_name) + '%s' % time.time()
 
         if os.path.exists(directory) is False:
@@ -57,11 +57,11 @@ class Download:
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
     def get_latest_version(self, abstract_name):
-        '''
+        """
         Get latest version on gitlab
         :param abstract_name: string
         :return: string | boolean
-        '''
+        """
         host = configuration.get('gitlab', 'host', raw=True) + '/' + configuration.get('gitlab', 'tag_path', raw=True)
         private_token = configuration.get('gitlab', 'private_token', raw=True)
         host = host.format(*[abstract_name, private_token])
