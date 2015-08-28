@@ -3,8 +3,8 @@ __author__ = 'aguimaraesviana'
 from middleware.jenkins.parser.parser import Parser
 from middleware.jenkins.job_builder import JobBuilder
 
-class JenkinsFacade:
 
+class JenkinsFacade:
     def create(self, json_data):
         if 'jobs' in json_data:
             self.__job_builder(json_data)

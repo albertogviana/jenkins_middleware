@@ -16,9 +16,13 @@ configuration.read(path.abspath(path.dirname(__file__)) + '/../config.ini')
 """
 Error 404 is returning a json
 """
+
+
 @app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({'error': 'Not found'}), 404)
 
+
 from middleware.jenkins.controllers import Controllers as JenkinsController
+
 api.add_resource(JenkinsController, '/api/jenkins/pipeline')
