@@ -7,7 +7,7 @@ import time
 import os
 
 
-class Download:
+class Download(object):
     FILE_EXTENSION = '.tar.gz'
 
     def get_archieve(self, job_name, abstract_name, version):

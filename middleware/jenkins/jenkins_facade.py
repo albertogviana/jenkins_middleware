@@ -3,7 +3,7 @@ from middleware.jenkins.job_builder import JobBuilder
 import jenkins
 
 
-class JenkinsFacade:
+class JenkinsFacade(object):
 
     def create(self, json_data):
         if 'jenkins_url' not in json_data:
