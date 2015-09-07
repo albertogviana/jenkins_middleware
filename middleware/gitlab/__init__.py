@@ -1,1 +1,3 @@
-__author__ = 'aguimaraesviana'
+"""
+Gitlab integration
+"""

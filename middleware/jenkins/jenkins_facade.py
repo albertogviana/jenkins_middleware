@@ -1,21 +1,13 @@
 from middleware.jenkins.parser.parser import Parser
 from middleware.jenkins.job_builder import JobBuilder
-from middleware.jenkins.jenkins_factory import JenkinsFactory
+
 
 class JenkinsFacade(object):
-
     def create(self, json_data):
         if 'jenkins_url' not in json_data:
             raise Exception('Inform Jenkins url')
 
         jenkins_url = json_data['jenkins_url']
-
-        server = JenkinsFactory().create(jenkins_url)
-
-        #
-        # server = jenkins.Jenkins(jenkins_url)
-        version = server.get_version()
-        print(version)
 
         if 'jobs' in json_data:
             self.__job_builder(json_data, jenkins_url)
@@ -27,4 +19,3 @@ class JenkinsFacade(object):
             JobBuilder().create(job_parser, jenkins_url)
 
         return True
-

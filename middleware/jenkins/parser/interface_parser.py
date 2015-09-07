@@ -1,4 +1,4 @@
-class InterfaceParser:
+class InterfaceParser(object):
     def get_placeholder(self, placeholder_name):
         raise NotImplementedError()
 

@@ -1,9 +1,8 @@
-__author__ = 'aguimaraesviana'
+import time
 
 from middleware import configuration
 import requests
 import tempfile
-import time
 import os
 
 
@@ -24,23 +23,27 @@ class Download(object):
             if latest_version is not None:
                 version = latest_version
 
-        host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
+        host = configuration.get('gitlab', 'host') + \
+               '/' + \
+               configuration.get('gitlab', 'download_path')
         host = host.format(*[abstract_name, version])
 
-        file = self.__prepare_file(job_name, abstract_name)
+        abstract_job_file = self.__prepare_file(job_name, abstract_name)
 
         response = requests.get(host, stream=True)
 
         if response.status_code != 200:
-            raise Exception("It was not find the abstract job " + abstract_name + " in gitlab.")
+            raise Exception(
+                "It was not find the abstract job " + abstract_name + " in gitlab."
+            )
 
-        with open(file, 'wb') as f:
+        with open(abstract_job_file, 'wb') as handle:
             for chunk in response.iter_content(chunk_size=1024):
                 if chunk:  # filter out keep-alive new chunks
-                    f.write(chunk)
-                    f.flush()
+                    handle.write(chunk)
+                    handle.flush()
 
-        return file
+        return abstract_job_file
 
     def __prepare_file(self, job_name, abstract_name):
         """
@@ -49,27 +52,33 @@ class Download(object):
         :param abstract_name: abstract name
         :return: the directory path and the filename
         """
-        directory = os.path.join(tempfile.gettempdir(), job_name) + '%s' % time.time()
+        directory = os.path.join(tempfile.gettempdir(), job_name) + '%s' \
+                                                                    % time.time()
 
         if os.path.exists(directory) is False:
             os.mkdir(directory)
 
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
-    def get_latest_version(self, abstract_name):
+    @classmethod
+    def get_latest_version(cls, abstract_name):
         """
         Get latest version on gitlab
         :param abstract_name: string
         :return: string | boolean
         """
-        host = configuration.get('gitlab', 'host', raw=True) + '/' + configuration.get('gitlab', 'tag_path', raw=True)
+        host = configuration.get('gitlab', 'host',
+                                 raw=True) + '/' + configuration.get('gitlab',
+                                                                     'tag_path',
+                                                                     raw=True)
         private_token = configuration.get('gitlab', 'private_token', raw=True)
         host = host.format(*[abstract_name, private_token])
 
         response = requests.get(host)
 
         if response.status_code != 200:
-            raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
+            raise Exception(
+                "It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
 
         result = response.json()
         # Get the first element
