@@ -14,7 +14,7 @@ class JobBuilder(AbstractBuilder):
         self.pre_process_configuration(folder)
 
         try:
-            server = JenkinsFactory().create(host,user,token)
+            server = JenkinsFactory().create(host, user, token)
 
             config_xml = self.get_file_content(path.join(folder, self.CONFIG_XML_PROCESSED))
             server.create_job(self._parser.get_name(), config_xml)
