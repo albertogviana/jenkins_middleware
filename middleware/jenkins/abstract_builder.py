@@ -6,7 +6,7 @@ import tarfile
 from json.encoder import JSONEncoder
 
 
-class AbstractBuilder:
+class AbstractBuilder(object):
 
     FOLDER_EXTENSION = '.git'
     CONFIG_XML_IN = 'config.xml'
@@ -15,9 +15,12 @@ class AbstractBuilder:
     """
     :param InterfaceParser
     """
-    _parser = ''
+    _parser = None
 
-    def get_git_abstract_project(self, parser: InterfaceParser):
+    _user = ''
+
+    @classmethod
+    def get_git_abstract_project(cls, parser: InterfaceParser):
         """
         Get the archieve on gitlab
         :param parser: InterfaceParser
@@ -58,7 +61,25 @@ class AbstractBuilder:
         command = "%s/replace '%s' %s %s" % (directory, placeholders, config_xml, output_xml)
 
         process = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
-        output, error = process.communicate()
+        output = process.communicate()
 
         if process.returncode == 1:
             raise Exception(output.decode('utf-8'))
+
+    @classmethod
+    def get_file_content(cls, file):
+        """
+        Return the file content
+        :param file: string
+        :return: string
+        """
+
+        if not path.isfile(file):
+            raise Exception("File %s not found" % file)
+
+        handle = open(file)
+        content = handle.read()
+        handle.close()
+
+        return content
+
