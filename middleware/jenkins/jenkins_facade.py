@@ -2,6 +2,7 @@ from middleware.jenkins.parser.parser import Parser
 from middleware.jenkins.job_builder import JobBuilder
 from middleware.jenkins.model.configuration import Configuration as ConfigurationModel
 from middleware import configuration
+from middleware.jenkins.jenkins import Jenkins
 
 
 class JenkinsFacade(object):
@@ -9,15 +10,17 @@ class JenkinsFacade(object):
         user = configuration.get('jenkins', 'user')
         jenkins_configuration = self.get_application_configuration(json_data["namespace"])
 
+        jenkins_server = self.get_jenkins_instance(jenkins_configuration.host, user, jenkins_configuration.token)
+
         if 'jobs' in json_data:
-            self.__job_builder(json_data, user, jenkins_configuration.host, jenkins_configuration.token)
+            self.__job_builder(json_data, jenkins_server)
         return json_data
 
     @classmethod
-    def __job_builder(cls, jobs_data, user, host, token):
+    def __job_builder(cls, jobs_data, jenkins_server):
         for job_data in jobs_data['jobs']:
             job_parser = Parser(job_data)
-            JobBuilder().create(job_parser, user, host, token)
+            JobBuilder(job_parser, jenkins_server)
 
         return True
 
@@ -30,3 +33,7 @@ class JenkinsFacade(object):
                 raise Exception('No configuration found for team %s jenkins. Please add it.' % team_name)
 
             raise Exception(str(inst))
+
+    @classmethod
+    def get_jenkins_instance(cls, host, user, password):
+        return Jenkins(host, user, password)

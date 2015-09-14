@@ -1,9 +1,8 @@
-from jenkins import Jenkins
+from jenkins import Jenkins as PythonJenkins
 
 
-class JenkinsFactory(object):
-    @staticmethod
-    def create(host, user=None, password=None):
+class Jenkins(PythonJenkins):
+    def __int__(self, host, user=None, password=None):
         """
         Create a Jenkins instance
         :param host: ``str``
@@ -11,5 +10,4 @@ class JenkinsFactory(object):
         :param password: ``str``
         :return: ``jenkins.Jenkins`` instance
         """
-        server = Jenkins(host, user, password)
-        return server
+        super().__init__.__init__(host, user, password)

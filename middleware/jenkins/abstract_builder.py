@@ -17,6 +17,8 @@ class AbstractBuilder(object):
     """
     _parser = None
 
+    _jenkins = None
+
     _user = ''
 
     @classmethod
