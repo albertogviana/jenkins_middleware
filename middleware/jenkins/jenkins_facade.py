@@ -6,7 +6,15 @@ from middleware.jenkins.jenkins import Jenkins
 
 
 class JenkinsFacade(object):
+    """
+    Jenkins Facade
+    """
     def create(self, json_data):
+        """
+        Create job and views
+        :param json_data:
+        :return:
+        """
         user = configuration.get('jenkins', 'user')
         jenkins_configuration = self.get_application_configuration(json_data["namespace"])
 
@@ -18,6 +26,12 @@ class JenkinsFacade(object):
 
     @classmethod
     def __job_builder(cls, jobs_data, jenkins_server):
+        """
+        Create job
+        :param jobs_data:
+        :param jenkins_server:
+        :return:
+        """
         for job_data in jobs_data['jobs']:
             job_parser = Parser(job_data)
             JobBuilder(job_parser, jenkins_server)
@@ -26,6 +40,11 @@ class JenkinsFacade(object):
 
     @classmethod
     def get_application_configuration(cls, team_name):
+        """
+        Return a configuration object with jenkins configuration
+        :param team_name: string
+        :return: ConfigurationModel
+        """
         try:
             return ConfigurationModel.query.filter_by(team_name=team_name).one()
         except Exception as inst:
@@ -36,4 +55,11 @@ class JenkinsFacade(object):
 
     @classmethod
     def get_jenkins_instance(cls, host, user, password):
+        """
+        Get jenkins instance
+        :param host: string
+        :param user: string
+        :param password: string
+        :return: Jenkins
+        """
         return Jenkins(host, user, password)
