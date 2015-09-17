@@ -3,6 +3,7 @@ from middleware.jenkins.job_builder import JobBuilder
 from middleware.jenkins.model.configuration import Configuration as ConfigurationModel
 from middleware import configuration
 from middleware.jenkins.jenkins import Jenkins
+from sqlalchemy.orm.exc import NoResultFound
 
 
 class JenkinsFacade(object):
@@ -34,7 +35,7 @@ class JenkinsFacade(object):
         """
         for job_data in jobs_data['jobs']:
             job_parser = Parser(job_data)
-            JobBuilder(job_parser, jenkins_server)
+            JobBuilder(job_parser, jenkins_server).create()
 
         return True
 
@@ -47,10 +48,9 @@ class JenkinsFacade(object):
         """
         try:
             return ConfigurationModel.query.filter_by(team_name=team_name).one()
+        except NoResultFound:
+            raise Exception('No configuration found for team %s jenkins. Please add it.' % team_name)
         except Exception as inst:
-            if type(inst).__name__ == "NoResultFound":
-                raise Exception('No configuration found for team %s jenkins. Please add it.' % team_name)
-
             raise Exception(str(inst))
 
     @classmethod

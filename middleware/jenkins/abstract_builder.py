@@ -80,8 +80,12 @@ class AbstractBuilder(object):
             raise Exception("File %s not found" % file)
 
         handle = open(file)
-        content = handle.read()
-        handle.close()
+        try:
+            content = handle.read()
+        except Exception as inst:
+            raise Exception(inst)
+        finally:
+            handle.close()
 
         return content
 
