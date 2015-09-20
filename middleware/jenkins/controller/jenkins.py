@@ -4,8 +4,13 @@ from flask.json import jsonify
 from middleware.jenkins.jenkins_facade import JenkinsFacade
 
 
-class Controllers(Resource):
-    def post(self):
+class Jenkins(Resource):
+    """
+    Jenkins Controller
+    """
+
+    @classmethod
+    def post(cls):
         try:
             data = request.get_json()
             return jsonify(JenkinsFacade().create(data))

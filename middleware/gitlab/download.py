@@ -1,6 +1,4 @@
 import time
-
-from middleware import configuration
 import requests
 import tempfile
 import os
@@ -12,6 +10,20 @@ class Download(object):
     """
 
     FILE_EXTENSION = '.tar.gz'
+
+    def __init__(self, configuration: dict):
+        self.configuration = configuration
+
+    def __get_configuration(self, key):
+        """
+        Get configuration
+        :param key: string
+        :return: string
+        """
+        if key not in self.configuration:
+            raise Exception("It was not possible to find the " + key + " in configuration.")
+
+        return self.configuration[key]
 
     def get_archieve(self, job_name, abstract_name, version):
         """
@@ -27,7 +39,7 @@ class Download(object):
             if latest_version is not None:
                 version = latest_version
 
-        host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
+        host = self.__get_configuration('host') + '/' + self.__get_configuration('download_path')
         host = host.format(*[abstract_name, version])
 
         abstract_job_file = self.__prepare_file(job_name, abstract_name)
@@ -61,16 +73,14 @@ class Download(object):
 
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
-    @classmethod
-    def get_latest_version(cls, abstract_name):
+    def get_latest_version(self, abstract_name):
         """
         Get latest version on gitlab
         :param abstract_name: string
         :return: string
         """
-        host = configuration.get('gitlab', 'host', raw=True) + '/' + \
-               configuration.get('gitlab', 'tag_path', raw=True)
-        private_token = configuration.get('gitlab', 'private_token', raw=True)
+        host = self.__get_configuration('host') + '/' + self.__get_configuration('tag_path')
+        private_token = self.__get_configuration('private_token')
         host = host.format(*[abstract_name, private_token])
 
         response = requests.get(host)

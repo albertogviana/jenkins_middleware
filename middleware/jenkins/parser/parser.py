@@ -1,7 +1,10 @@
-from middleware.jenkins.parser.interface_parser import InterfaceParser
+from middleware.jenkins.parser.interface.interface_parser import InterfaceParser
 
 
 class Parser(InterfaceParser):
+    """
+    Json parser
+    """
     JOB_KEY = 'job'
     JOB_NOT_FOUND = 'Job field was not found.'
 
@@ -70,7 +73,7 @@ class Parser(InterfaceParser):
         Check if the field job exists
         :return: boolean
         """
-        if self.PLACEHOLDER_KEY in self.__json_data[self.PLACEHOLDER_KEY]:
+        if self.PLACEHOLDER_KEY in self.__json_data:
             return True
         return False
 
@@ -78,12 +81,12 @@ class Parser(InterfaceParser):
         """
         Get a placeholder
         :param placeholder_name:
-        :return: mixed
+        :return: string
         """
         if self._has_placeholder() is False:
             raise Exception(self.PLACEHOLDER_NOT_FOUND)
 
-        if placeholder_name not in self.__json_data:
+        if placeholder_name not in self.__json_data[self.PLACEHOLDER_KEY]:
             raise Exception(placeholder_name + " field was not found.")
 
         return self.__json_data[self.PLACEHOLDER_KEY][placeholder_name]
@@ -91,9 +94,9 @@ class Parser(InterfaceParser):
     def get_placeholders(self):
         """
         Get all placeholders
-        :return: mixed
+        :return: dict
         """
-        if self.PLACEHOLDER_KEY not in self.__json_data:
+        if self._has_placeholder() is False:
             raise Exception(self.PLACEHOLDER_NOT_FOUND)
 
         return self.__json_data[self.PLACEHOLDER_KEY]

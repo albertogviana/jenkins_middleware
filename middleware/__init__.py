@@ -11,12 +11,12 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 api = Api(app)
 
-from middleware.jenkins.controllers import Controllers as JenkinsController
+from middleware.jenkins.controller.jenkins import Jenkins as JenkinsController
 from middleware.jenkins.model.configuration import Configuration as ConfigurationEntity
 
 
 @app.errorhandler(404)
-def not_found(error):
+def not_found():
     """
     Error 404 is returning a json
     """

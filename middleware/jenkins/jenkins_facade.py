@@ -1,8 +1,8 @@
 from middleware.jenkins.parser.parser import Parser
-from middleware.jenkins.job_builder import JobBuilder
+from middleware.jenkins.builder.job_builder import JobBuilder
 from middleware.jenkins.model.configuration import Configuration as ConfigurationModel
 from middleware import configuration
-from middleware.jenkins.jenkins import Jenkins
+from middleware.jenkins.services.jenkins import Jenkins
 from sqlalchemy.orm.exc import NoResultFound
 
 

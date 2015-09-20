@@ -1,12 +1,17 @@
-from middleware.jenkins.parser.interface_parser import InterfaceParser
+from subprocess import Popen, PIPE
+from json.encoder import JSONEncoder
+
+from middleware.jenkins.parser.interface.interface_parser import InterfaceParser
+from middleware.jenkins.services.jenkins import Jenkins
 from middleware.gitlab.download import Download
 from os import path
-from subprocess import Popen, PIPE
 import tarfile
-from json.encoder import JSONEncoder
 
 
 class AbstractBuilder(object):
+    """
+    Abstract Builder implements methods that it will be used for the concrete class
+    """
 
     FOLDER_EXTENSION = '.git'
     CONFIG_XML_IN = 'config.xml'
@@ -17,9 +22,19 @@ class AbstractBuilder(object):
     """
     _parser = None
 
+    """
+    :param Jenkins
+    """
     _jenkins = None
 
+    """
+    :param string
+    """
     _user = ''
+
+    def __init__(self, job: InterfaceParser, jenkins: Jenkins):
+        self._parser = job
+        self._jenkins = jenkins
 
     @classmethod
     def get_git_abstract_project(cls, parser: InterfaceParser):
@@ -46,11 +61,12 @@ class AbstractBuilder(object):
             directory = path.dirname(compress_file)
             tar = tarfile.open(compress_file)
             tar.extractall(path=directory)
-            tar.close()
-
-            return path.join(directory, self._parser.get_abstract_name() + self.FOLDER_EXTENSION)
         except Exception as inst:
             raise Exception(inst)
+        finally:
+            tar.close()
+
+        return path.join(directory, self._parser.get_abstract_name() + self.FOLDER_EXTENSION)
 
     def pre_process_configuration(self, directory):
         """
@@ -77,7 +93,7 @@ class AbstractBuilder(object):
         """
 
         if not path.isfile(file):
-            raise Exception("File %s not found" % file)
+            raise Exception("File %s was not found" % file)
 
         handle = open(file)
         try:
@@ -88,4 +104,3 @@ class AbstractBuilder(object):
             handle.close()
 
         return content
-
