@@ -10,15 +10,17 @@ class TestDownload(object):
                                "https://localhost/api/v3/projects/web-jenkins-jobs%2Funit-tests-codeception/repository/tags?private_token=123456",
                                status=404)
 
-        configuration = {
-            "host": "https://localhost",
-            "tag_path": "api/v3/projects/web-jenkins-jobs%2F{}/repository/tags?private_token={}",
-            "private_token": "123456"
-        }
-
-        gitlab = Download(configuration)
+        gitlab = Download(self.get_data())
 
         with pytest.raises(Exception) as inst:
             gitlab.get_latest_version("unit-tests-codeception")
         assert str(
             inst.value) == "It was not possible to get the tags for abstract job unit-tests-codeception in gitlab."
+
+    @classmethod
+    def get_data(cls):
+        return {
+            "host": "https://localhost",
+            "tag_path": "api/v3/projects/web-jenkins-jobs%2F{}/repository/tags?private_token={}",
+            "private_token": "123456"
+        }

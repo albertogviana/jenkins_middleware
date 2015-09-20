@@ -58,6 +58,12 @@ class TestParser(object):
             parser.get_placeholder('test')
         assert str(inst.value) == "test field was not found."
 
+    def test_get_placeholder_placeholders_not_found(self):
+        parser = Parser({})
+        with pytest.raises(Exception) as inst:
+            parser.get_placeholder('test')
+        assert str(inst.value) == "Placeholder field was not found."
+
     @classmethod
     def _get_data(cls):
         return {
