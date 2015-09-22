@@ -4,19 +4,6 @@ from middleware.gitlab.download import Download
 
 
 class TestDownload(object):
-    def test_get_latest_version_not_found(self):
-        httpretty.enable()  # enable HTTPretty so that it will monkey patch the socket module
-        httpretty.register_uri(httpretty.GET,
-                               "https://localhost/api/v3/projects/web-jenkins-jobs%2Funit-tests-codeception/repository/tags?private_token=123456",
-                               status=404)
-
-        gitlab = Download(self.get_data())
-
-        with pytest.raises(Exception) as inst:
-            gitlab.get_latest_version("unit-tests-codeception")
-        assert str(
-            inst.value) == "It was not possible to get the tags for abstract job unit-tests-codeception in gitlab."
-
     def test_get_latest_version(self):
         httpretty.enable()  # enable HTTPretty so that it will monkey patch the socket module
         httpretty.register_uri(httpretty.GET,
@@ -25,9 +12,9 @@ class TestDownload(object):
                                status=200)
 
         gitlab = Download(self.get_data())
-        gitlab.get_latest_version("unit-tests-codeception") is "v1.1.1"
+        gitlab.get_latest_version("unit-tests-codeception", "v1.*") is "v1.1.1"
 
-    def test_get_latest_version_return_none(self):
+    def test_get_latest_version_no_version_exception(self):
         httpretty.enable()  # enable HTTPretty so that it will monkey patch the socket module
         httpretty.register_uri(httpretty.GET,
                                "https://localhost/api/v3/projects/web-jenkins-jobs%2Funit-tests-codeception/repository/tags?private_token=123456",
@@ -35,7 +22,22 @@ class TestDownload(object):
                                status=200)
 
         gitlab = Download(self.get_data())
-        gitlab.get_latest_version("unit-tests-codeception") is None
+        with pytest.raises(Exception) as inst:
+            gitlab.get_latest_version("unit-tests-codeception", "v2.*")
+        assert str(inst.value) == "No matching version for unit-tests-codeception v2.*."
+
+    def test_get_latest_version_no_abstract_job_exception(self):
+        httpretty.enable()  # enable HTTPretty so that it will monkey patch the socket module
+        httpretty.register_uri(httpretty.GET,
+                               "https://localhost/api/v3/projects/web-jenkins-jobs%2Funit-tests-codeception2/repository/tags?private_token=123456",
+                               body="{}",
+                               status=404)
+
+        gitlab = Download(self.get_data())
+        with pytest.raises(Exception) as inst:
+            gitlab.get_latest_version("unit-tests-codeception2", "v2.*")
+        assert str(
+            inst.value) == "It was not possible to get the tags for abstract job unit-tests-codeception2 in gitlab."
 
     @classmethod
     def get_data(cls):

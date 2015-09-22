@@ -35,7 +35,7 @@ class Download(object):
         """
 
         if version.endswith('*'):
-            latest_version = self.get_latest_version(abstract_name)
+            latest_version = self.get_latest_version(abstract_name, version)
             if latest_version is not None:
                 version = latest_version
 
@@ -73,10 +73,11 @@ class Download(object):
 
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
-    def get_latest_version(self, abstract_name):
+    def get_latest_version(self, abstract_name, version):
         """
         Get latest version on gitlab
         :param abstract_name: string
+        :param version: string
         :return: string
         """
         host = self.__get_configuration('host') + '/' + self.__get_configuration('tag_path')
@@ -86,13 +87,14 @@ class Download(object):
         response = requests.get(host)
 
         if response.status_code != 200:
-            raise Exception(
-                "It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
+            raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
 
-        result = response.json()
-        # Get the first element
-        first_element = result.pop(0)
-        if 'name' not in first_element:
-            return None
+        if version.endswith('*'):
+            version_prefix = version[:-1]
 
-        return first_element["name"]
+        tags = response.json()
+        for tag in tags:
+            if tag["name"].find(version_prefix) != -1:
+                return tag["name"]
+
+        raise Exception("No matching version for " + abstract_name + " " + version + ".")
