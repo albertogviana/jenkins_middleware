@@ -2,9 +2,10 @@ import time
 import requests
 import tempfile
 import os
+from middleware.gitlab.interface.gitlab import InterfaceGitlab
 
 
-class Download(object):
+class Download(InterfaceGitlab):
     """
     Get files from gitlab
     """

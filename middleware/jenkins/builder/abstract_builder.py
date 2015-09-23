@@ -1,7 +1,7 @@
 from subprocess import Popen, PIPE
 from json.encoder import JSONEncoder
 
-from middleware.jenkins.parser.interface.interface_parser import InterfaceParser
+from middleware.jenkins.parser.interface.parser import InterfaceParser
 from middleware.jenkins.services.jenkins import Jenkins
 from middleware.gitlab.download import Download
 from os import path
