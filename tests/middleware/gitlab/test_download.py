@@ -1,6 +1,7 @@
 import httpretty
 import pytest
 from middleware.gitlab.download import Download
+import os
 
 
 class TestDownload(object):
@@ -39,12 +40,62 @@ class TestDownload(object):
         assert str(
             inst.value) == "It was not possible to get the tags for abstract job unit-tests-codeception2 in gitlab."
 
+    def test_get_archieve(self):
+
+        basedir = os.path.abspath(os.path.dirname(__file__))
+        try:
+            handle = open(basedir + "/../../fixture/start-cbab6de129fdece998a7aa1c4f6e8be34d2170be.tar.gz", "rb")
+            content = handle.read()
+        except Exception as inst:
+            print(inst)
+        finally:
+            handle.close()
+
+        httpretty.enable()  # enable HTTPretty so that it will monkey patch the socket module
+        httpretty.register_uri(httpretty.GET,
+                               "https://localhost/api/v3/projects/web-jenkins-jobs%2Funit-tests-codeception/repository/tags?private_token=123456",
+                               body=self.get_gitlab_responnse(),
+                               status=200)
+
+        httpretty.register_uri(httpretty.GET,
+                               "https://localhost/web-jenkins-jobs/unit-tests-codeception/repository/archive.tar.gz?ref=v1.1.1",
+                               body=content,
+                               # content_type="text/plain",
+                               status=200)
+
+        gitlab = Download(self.get_data())
+        result_archieve = gitlab.get_archieve("unit", "unit-tests-codeception", "v*")
+
+        abstract_job = result_archieve.split("/")
+        assert abstract_job.pop() == "unit-tests-codeception.tar.gz"
+        os.remove(result_archieve)
+
+    def test_get_archieve_job_not_not_found(self):
+
+        httpretty.register_uri(httpretty.GET,
+                               "https://localhost/web-jenkins-jobs/unit-tests-codeception/repository/archive.tar.gz?ref=v1.1.1",
+                               body="",
+                               content_type="text/plain",
+                               status=404)
+
+        gitlab = Download(self.get_data())
+        with pytest.raises(Exception) as inst:
+            gitlab.get_archieve("unit", "unit-tests-codeception", "v1.1.1.")
+        assert str(inst.value) == "It was not find the abstract job unit-tests-codeception in gitlab."
+
+    def test_get_archieve_configuration_not_not_found(self):
+        gitlab = Download({})
+        with pytest.raises(Exception) as inst:
+            gitlab.get_archieve("unit", "unit-tests-codeception", "v1.1.1.")
+        assert str(inst.value) == "It was not possible to find the gitlab key host in configuration."
+
     @classmethod
     def get_data(cls):
         return {
             "host": "https://localhost",
             "tag_path": "api/v3/projects/web-jenkins-jobs%2F{}/repository/tags?private_token={}",
-            "private_token": "123456"
+            "private_token": "123456",
+            "download_path": "web-jenkins-jobs/{}/repository/archive.tar.gz?ref={}"
         }
 
     @classmethod

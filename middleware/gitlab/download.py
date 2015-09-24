@@ -12,6 +12,15 @@ class Download(InterfaceGitlab):
 
     FILE_EXTENSION = '.tar.gz'
 
+    """
+    Gitlab parameters
+    """
+    HOST = 'host'
+    DOWNLOAD_PATH = 'download_path'
+    TAG_PATH = 'tag_path'
+    PRIVATE_TOKEN = 'private_token'
+
+
     def __init__(self, configuration: dict):
         self.configuration = configuration
 
@@ -22,7 +31,7 @@ class Download(InterfaceGitlab):
         :return: string
         """
         if key not in self.configuration:
-            raise Exception("It was not possible to find the " + key + " in configuration.")
+            raise Exception("It was not possible to find the gitlab key " + key + " in configuration.")
 
         return self.configuration[key]
 
@@ -36,11 +45,9 @@ class Download(InterfaceGitlab):
         """
 
         if version.endswith('*'):
-            latest_version = self.get_latest_version(abstract_name, version)
-            if latest_version is not None:
-                version = latest_version
+            version = self.get_latest_version(abstract_name, version)
 
-        host = self.__get_configuration('host') + '/' + self.__get_configuration('download_path')
+        host = self.__get_configuration(self.HOST) + '/' + self.__get_configuration(self.DOWNLOAD_PATH)
         host = host.format(*[abstract_name, version])
 
         abstract_job_file = self.__prepare_file(job_name, abstract_name)
@@ -81,8 +88,8 @@ class Download(InterfaceGitlab):
         :param version: string
         :return: string
         """
-        host = self.__get_configuration('host') + '/' + self.__get_configuration('tag_path')
-        private_token = self.__get_configuration('private_token')
+        host = self.__get_configuration(self.HOST) + '/' + self.__get_configuration(self.TAG_PATH)
+        private_token = self.__get_configuration(self.PRIVATE_TOKEN)
         host = host.format(*[abstract_name, private_token])
 
         response = requests.get(host)
