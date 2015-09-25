@@ -1,23 +1,38 @@
 from middleware.jenkins.builder.abstract_builder import AbstractBuilder
+from middleware.jenkins.builder.interface.builder_executor import BuilderExecutor
 from os import path
 
 
-class JobBuilder(AbstractBuilder):
+class JobBuilder(AbstractBuilder, BuilderExecutor):
     """
     Job Builder
     """
-
-    def create(self):
+    def process(self):
         """
-        Create job on jenkins
+        Process the abstract job
         :return:
         """
         try:
-            file = self.get_git_abstract_project(self._parser)
-            folder = self.extract_package(file)
-            self.pre_process_configuration(folder)
-
-            config_xml = self.get_file_content(path.join(folder, self.CONFIG_XML_PROCESSED))
-            self._jenkins.create_job(self._parser.get_name(), config_xml)
+            self.file = self.get_git_abstract_project(self._parser)
+            self.folder = self.extract_package(self.file)
+            self.pre_process_configuration(self.folder)
+            self.config_xml = self.get_file_content(path.join(self.folder, self.CONFIG_XML_PROCESSED))
         except Exception as inst:
             raise Exception(inst.args)
+
+    def get_name(self):
+        """
+        Get job name
+        :return: string
+        """
+        return self._parser.get_name()
+
+    def get_config_xml(self):
+        """
+        Get config.xml
+        :return: string
+        """
+        return self.config_xml
+
+    def get_folder(self):
+        return self.folder

@@ -1,14 +1,14 @@
 from subprocess import Popen, PIPE
 from json.encoder import JSONEncoder
 
+from middleware.jenkins.builder.interface.builder import Builder
 from middleware.jenkins.parser.interface.parser import InterfaceParser
-from middleware.jenkins.services.jenkins import Jenkins
 from middleware.gitlab.download import Download
 from os import path
 import tarfile
 
 
-class AbstractBuilder(object):
+class AbstractBuilder(Builder):
     """
     Abstract Builder implements methods that it will be used for the concrete class
     """
@@ -22,28 +22,20 @@ class AbstractBuilder(object):
     """
     _parser = None
 
-    """
-    :param Jenkins
-    """
-    _jenkins = None
-
-    """
-    :param string
-    """
-    _user = ''
-
-    def __init__(self, job: InterfaceParser, jenkins: Jenkins):
+    def __init__(self, job: InterfaceParser, download: Download):
         self._parser = job
-        self._jenkins = jenkins
+        self._download = download
+        self.file = ''
+        self.folder = ''
+        self.config_xml = ''
 
-    @classmethod
-    def get_git_abstract_project(cls, parser: InterfaceParser):
+    def get_git_abstract_project(self, parser: InterfaceParser):
         """
         Get the archieve on gitlab
         :param parser: InterfaceParser
         :return: file path
         """
-        file = Download().get_archieve(
+        file = self._download.get_archieve(
             parser.get_name(),
             parser.get_abstract_name(),
             parser.get_abstract_version()
