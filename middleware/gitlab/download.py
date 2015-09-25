@@ -1,4 +1,5 @@
 import time
+
 import requests
 import tempfile
 import os
@@ -19,7 +20,6 @@ class Download(InterfaceGitlab):
     DOWNLOAD_PATH = 'download_path'
     TAG_PATH = 'tag_path'
     PRIVATE_TOKEN = 'private_token'
-
 
     def __init__(self, configuration: dict):
         self.configuration = configuration
