@@ -1,17 +1,39 @@
 import time
 
-from middleware import configuration
 import requests
 import tempfile
 import os
+from middleware.gitlab.interface.gitlab import InterfaceGitlab
 
 
-class Download(object):
+class Download(InterfaceGitlab):
     """
     Get files from gitlab
     """
 
     FILE_EXTENSION = '.tar.gz'
+
+    """
+    Gitlab parameters
+    """
+    HOST = 'host'
+    DOWNLOAD_PATH = 'download_path'
+    TAG_PATH = 'tag_path'
+    PRIVATE_TOKEN = 'private_token'
+
+    def __init__(self, configuration: dict):
+        self.configuration = configuration
+
+    def __get_configuration(self, key):
+        """
+        Get configuration
+        :param key: string
+        :return: string
+        """
+        if key not in self.configuration:
+            raise Exception("It was not possible to find the gitlab key " + key + " in configuration.")
+
+        return self.configuration[key]
 
     def get_archieve(self, job_name, abstract_name, version):
         """
@@ -23,11 +45,9 @@ class Download(object):
         """
 
         if version.endswith('*'):
-            latest_version = self.get_latest_version(abstract_name)
-            if latest_version is not None:
-                version = latest_version
+            version = self.get_latest_version(abstract_name, version)
 
-        host = configuration.get('gitlab', 'host') + '/' + configuration.get('gitlab', 'download_path')
+        host = self.__get_configuration(self.HOST) + '/' + self.__get_configuration(self.DOWNLOAD_PATH)
         host = host.format(*[abstract_name, version])
 
         abstract_job_file = self.__prepare_file(job_name, abstract_name)
@@ -61,28 +81,28 @@ class Download(object):
 
         return os.path.join(directory, abstract_name + self.FILE_EXTENSION)
 
-    @classmethod
-    def get_latest_version(cls, abstract_name):
+    def get_latest_version(self, abstract_name, version):
         """
         Get latest version on gitlab
         :param abstract_name: string
+        :param version: string
         :return: string
         """
-        host = configuration.get('gitlab', 'host', raw=True) + '/' + \
-               configuration.get('gitlab', 'tag_path', raw=True)
-        private_token = configuration.get('gitlab', 'private_token', raw=True)
+        host = self.__get_configuration(self.HOST) + '/' + self.__get_configuration(self.TAG_PATH)
+        private_token = self.__get_configuration(self.PRIVATE_TOKEN)
         host = host.format(*[abstract_name, private_token])
 
         response = requests.get(host)
 
         if response.status_code != 200:
-            raise Exception(
-                "It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
+            raise Exception("It was not possible to get the tags for abstract job " + abstract_name + " in gitlab.")
 
-        result = response.json()
-        # Get the first element
-        first_element = result.pop(0)
-        if 'name' not in first_element:
-            return None
+        if version.endswith('*'):
+            version_prefix = version[:-1]
 
-        return first_element["name"]
+        tags = response.json()
+        for tag in tags:
+            if tag["name"].find(version_prefix) != -1:
+                return tag["name"]
+
+        raise Exception("No matching version for " + abstract_name + " " + version + ".")

@@ -1,12 +1,17 @@
-from middleware.jenkins.parser.interface_parser import InterfaceParser
-from middleware.gitlab.download import Download
-from os import path
 from subprocess import Popen, PIPE
-import tarfile
 from json.encoder import JSONEncoder
 
+from middleware.jenkins.builder.interface.builder import Builder
+from middleware.jenkins.parser.interface.parser import InterfaceParser
+from middleware.gitlab.download import Download
+from os import path
+import tarfile
 
-class AbstractBuilder(object):
+
+class AbstractBuilder(Builder):
+    """
+    Abstract Builder implements methods that it will be used for the concrete class
+    """
 
     FOLDER_EXTENSION = '.git'
     CONFIG_XML_IN = 'config.xml'
@@ -17,18 +22,20 @@ class AbstractBuilder(object):
     """
     _parser = None
 
-    _jenkins = None
+    def __init__(self, job: InterfaceParser, download: Download):
+        self._parser = job
+        self._download = download
+        self.file = ''
+        self.folder = ''
+        self.config_xml = ''
 
-    _user = ''
-
-    @classmethod
-    def get_git_abstract_project(cls, parser: InterfaceParser):
+    def get_git_abstract_project(self, parser: InterfaceParser):
         """
         Get the archieve on gitlab
         :param parser: InterfaceParser
         :return: file path
         """
-        file = Download().get_archieve(
+        file = self._download.get_archieve(
             parser.get_name(),
             parser.get_abstract_name(),
             parser.get_abstract_version()
@@ -46,11 +53,12 @@ class AbstractBuilder(object):
             directory = path.dirname(compress_file)
             tar = tarfile.open(compress_file)
             tar.extractall(path=directory)
-            tar.close()
-
-            return path.join(directory, self._parser.get_abstract_name() + self.FOLDER_EXTENSION)
         except Exception as inst:
             raise Exception(inst)
+        finally:
+            tar.close()
+
+        return path.join(directory, self._parser.get_abstract_name() + self.FOLDER_EXTENSION)
 
     def pre_process_configuration(self, directory):
         """
@@ -77,7 +85,7 @@ class AbstractBuilder(object):
         """
 
         if not path.isfile(file):
-            raise Exception("File %s not found" % file)
+            raise Exception("File %s was not found" % file)
 
         handle = open(file)
         try:
@@ -88,4 +96,3 @@ class AbstractBuilder(object):
             handle.close()
 
         return content
-
