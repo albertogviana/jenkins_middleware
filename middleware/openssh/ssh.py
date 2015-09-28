@@ -4,23 +4,23 @@ from middleware.openssh.exception.openssh_exception import SshException
 
 
 class Ssh(object):
-    SSH_COMMAND = "ssh -i {} -o StrictHostKeyChecking=no {}@{} {}"
+    SSH_COMMAND = "/usr/bin/ssh -i {} -o StrictHostKeyChecking=no {}@{} {}"
 
     def __init__(self, configuration: {}):
         self.configuration = configuration
 
         if "user" not in self.configuration:
-            raise SshException("User parameter is required for scp.")
+            raise SshException("User parameter is required for ssh.")
 
         if "key_file" not in self.configuration:
-            raise SshException("Key file is required for scp.")
+            raise SshException("Key file is required for ssh.")
 
     @classmethod
     def _get_host(cls, host):
         hostname = urlparse(host)
 
         if hostname.netloc is "":
-            raise SshException("The host " + host + " informed is not valid for scp.")
+            raise SshException("The host " + host + " informed is not valid for ssh.")
 
         return hostname.netloc
 
@@ -45,10 +45,10 @@ class Ssh(object):
         :param shell_script:  string
         """
         if host is "":
-            raise SshException("The host parameter could not be empty on scp.")
+            raise SshException("The host parameter could not be empty on ssh.")
 
         if shell_script is "":
-            raise SshException("The shell script parameter could not be empty on scp.")
+            raise SshException("The shell script parameter could not be empty on ssh.")
 
         command = self._parse(host, shell_script)
         print(command)

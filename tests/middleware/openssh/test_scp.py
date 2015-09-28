@@ -30,7 +30,25 @@ class TestScp(object):
         command = scp._parse('/var/www', '/var/www/my-project', 'http://jenkins.backend.com/')
         assert result == command
 
+    def test_execute_source_exception(self):
+        scp = Scp(self.get_data())
+        with pytest.raises(Exception) as inst:
+            scp.execute('', '', '')
+        assert str(inst.value) == "The source parameter could not be empty on scp."
 
+    def test_execute_destination_exception(self):
+        scp = Scp(self.get_data())
+
+        with pytest.raises(Exception) as inst:
+            scp.execute('/var/www', '', '')
+        assert str(inst.value) == "The destination parameter could not be empty on scp."
+
+    def test_execute_host_exception(self):
+        scp = Scp(self.get_data())
+
+        with pytest.raises(Exception) as inst:
+            scp.execute('/var/www', '/var/www/my-project', '')
+        assert str(inst.value) == "The host parameter could not be empty on scp."
 
     @classmethod
     def get_data(cls):
