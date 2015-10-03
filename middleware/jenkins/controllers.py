@@ -6,6 +6,5 @@ from .facade import Facade
 
 @api_jenkins.route('/pipeline', methods=['POST'])
 def handle_pipeline():
-    print(request.json)
     response = Facade(current_app.config).process(request.json)
     return jsonify(response)
