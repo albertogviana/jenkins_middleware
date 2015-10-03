@@ -6,7 +6,6 @@ from middleware.gitlab.download import Download
 from middleware.jenkins.services.jenkins_api import JenkinsApi
 from sqlalchemy.orm.exc import NoResultFound
 from middleware.jenkins.command.pipeline_command import PipelineCommand
-from ..exceptions import ValidationError
 from werkzeug.exceptions import BadRequest
 
 
@@ -23,16 +22,13 @@ class Facade(object):
     def process(self, json_data):
         """
         Create job and views
-        :param json_data:
+        :param json_data: str
         :return:
         """
 
-        if json_data is None:
-            #{'status': 400, 'error': 'bad request', 'message': "Invalid json."}
-            print("Exception")
-            raise Exception("Invalid json.")
+        if json_data is None or len(json_data) <= 2:
+            raise BadRequest(description="Invalid json.")
 
-        print(json_data)
         self.jenkins_configuration = self.get_application_configuration(json_data["namespace"])
 
         if 'jobs' in json_data:
