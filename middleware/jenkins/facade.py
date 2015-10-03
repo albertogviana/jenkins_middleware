@@ -1,14 +1,16 @@
 from middleware.jenkins.parser.parser import Parser
 from middleware.jenkins.builder.job_builder import JobBuilder
-from middleware.jenkins.model.configuration import Configuration as ConfigurationModel
+from middleware.jenkins.models import Configuration as ConfigurationModel
 from middleware.jenkins.builder.pipeline import Pipeline
 from middleware.gitlab.download import Download
 from middleware.jenkins.services.jenkins_api import JenkinsApi
 from sqlalchemy.orm.exc import NoResultFound
 from middleware.jenkins.command.pipeline_command import PipelineCommand
+from ..exceptions import ValidationError
+from werkzeug.exceptions import BadRequest
 
 
-class JenkinsFacade(object):
+class Facade(object):
     """
     Jenkins Facade
     """
@@ -25,6 +27,12 @@ class JenkinsFacade(object):
         :return:
         """
 
+        if json_data is None:
+            #{'status': 400, 'error': 'bad request', 'message': "Invalid json."}
+            print("Exception")
+            raise Exception("Invalid json.")
+
+        print(json_data)
         self.jenkins_configuration = self.get_application_configuration(json_data["namespace"])
 
         if 'jobs' in json_data:
