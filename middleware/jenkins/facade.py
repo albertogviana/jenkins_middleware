@@ -3,7 +3,7 @@ from middleware.jenkins.builder.job_builder import JobBuilder
 from middleware.jenkins.models import Configuration as ConfigurationModel
 from middleware.jenkins.builder.pipeline import Pipeline
 from middleware.gitlab.download import Download
-from middleware.jenkins.services.jenkins_api import JenkinsApi
+from .jenkins_api import JenkinsApi
 from sqlalchemy.orm.exc import NoResultFound
 from middleware.jenkins.command.pipeline_command import PipelineCommand
 from werkzeug.exceptions import BadRequest
@@ -14,10 +14,14 @@ class Facade(object):
     Jenkins Facade
     """
 
-    def __init__(self, app_configuration):
-        self.app_configuration = app_configuration
+    def __init__(self, app, pipeline=None):
+        self.app_configuration = app
         self.jenkins_configuration = None
-        self.pipeline = Pipeline()
+
+        if pipeline is None:
+            pipeline = Pipeline()
+
+        self.pipeline = pipeline
 
     def process(self, json_data):
         """

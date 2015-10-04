@@ -1,4 +1,4 @@
-from middleware.jenkins.services.jenkins_api import JenkinsApi
+from middleware.jenkins.jenkins_api import JenkinsApi
 from middleware.jenkins.builder.pipeline import Pipeline
 from middleware.jenkins.command.scp_command import ScpCommand
 

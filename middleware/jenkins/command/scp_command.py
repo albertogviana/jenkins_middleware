@@ -1,7 +1,7 @@
 import os
 from middleware.openssh.scp import Scp
 from middleware.jenkins.builder.interface.builder_executor import BuilderExecutor
-from middleware.jenkins.services.jenkins_api import JenkinsApi
+from middleware.jenkins.jenkins_api import JenkinsApi
 from middleware.jenkins.command.ssh_command import SshCommand
 
 
