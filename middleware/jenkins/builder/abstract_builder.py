@@ -1,14 +1,14 @@
 from subprocess import Popen, PIPE
 from json.encoder import JSONEncoder
 
-from middleware.jenkins.builder.interface.builder import Builder
-from middleware.jenkins.parser.interface.parser import InterfaceParser
+from .interfaces import AbstractBuilderInterface
+from ..parser.interface.parser import InterfaceParser
 from middleware.gitlab.download import Download
 from os import path
 import tarfile
 
 
-class AbstractBuilder(Builder):
+class AbstractBuilder(AbstractBuilderInterface):
     """
     Abstract Builder implements methods that it will be used for the concrete class
     """

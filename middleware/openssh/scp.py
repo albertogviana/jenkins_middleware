@@ -1,21 +1,40 @@
 from subprocess import Popen, PIPE
 from urllib.parse import urlparse
-from middleware.openssh.interface.openssh import Openssh
-from middleware.openssh.exception.openssh_exception import ScpException
+
+from .interfaces import Openssh
+from .exceptions import ScpException
 
 
 class Scp(Openssh):
     SCP_COMMAND = '/usr/bin/scp -o StrictHostKeyChecking=no -o ConnectTimeout={:d} -i {} -r {} {}@{}:{} 2>&1'
+    OPENSSH_CONFIGURATION = "OPENSSH_CONFIGURATION"
+    KEY_FILE = "key_file"
+    USER = "user"
 
-    def __init__(self, configuration: {}, connection_timeout=10):
+    def __init__(self, app=None, connection_timeout=10):
+        self.app = None
         self.connection_timeout = connection_timeout
-        self.configuration = configuration
 
-        if "user" not in self.configuration:
-            raise ScpException("User parameter is required for scp.")
+        if app is not None:
+            self.init_app(app)
 
-        if "key_file" not in self.configuration:
-            raise ScpException("Key file is required for scp.")
+    def init_app(self, app):
+        self.app = app
+
+        if self.OPENSSH_CONFIGURATION not in self.app.config:
+            raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
+
+        if self.USER not in self.app.config[self.OPENSSH_CONFIGURATION]:
+            raise ScpException("User parameter is required for ssh.")
+
+        if self.KEY_FILE not in self.app.config[self.OPENSSH_CONFIGURATION]:
+            raise ScpException("Key file is required for ssh.")
+
+    def has_app(self):
+        if self.app is None:
+            return False
+
+        return True
 
     @classmethod
     def _get_host(cls, host):
@@ -34,11 +53,14 @@ class Scp(Openssh):
         :param host:  string
         :return: string
         """
+        if self.has_app() is False:
+            raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for scp.")
+
         return self.SCP_COMMAND.format(*[
             self.connection_timeout,
-            self.configuration["key_file"],
+            self.app.config[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
             source,
-            self.configuration["user"],
+            self.app.config[self.OPENSSH_CONFIGURATION][self.USER],
             self._get_host(host),
             destination
         ])
@@ -60,7 +82,6 @@ class Scp(Openssh):
             raise ScpException("The host parameter could not be empty on scp.")
 
         command = self._parse(source, destination, host)
-        print(command)
         process = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
         output = process.communicate()
 

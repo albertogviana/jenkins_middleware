@@ -1,19 +1,38 @@
 from subprocess import Popen, PIPE
 from urllib.parse import urlparse
-from middleware.openssh.exception.openssh_exception import SshException
+from .exceptions import SshException
 
 
 class Ssh(object):
     SSH_COMMAND = "/usr/bin/ssh -i {} -o StrictHostKeyChecking=no {}@{} {}"
+    OPENSSH_CONFIGURATION = "OPENSSH_CONFIGURATION"
+    KEY_FILE = "key_file"
+    USER = "user"
 
-    def __init__(self, configuration: {}):
-        self.configuration = configuration
+    def __init__(self, app=None):
 
-        if "user" not in self.configuration:
+        self.app = None
+
+        if app is not None:
+            self.init_app(app)
+
+    def init_app(self, app):
+        self.app = app
+
+        if self.OPENSSH_CONFIGURATION not in self.app.config:
+            raise SshException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
+
+        if self.USER not in self.app.config[self.OPENSSH_CONFIGURATION]:
             raise SshException("User parameter is required for ssh.")
 
-        if "key_file" not in self.configuration:
+        if self.KEY_FILE not in self.app.config[self.OPENSSH_CONFIGURATION]:
             raise SshException("Key file is required for ssh.")
+
+    def has_app(self):
+        if self.app is None:
+            return False
+
+        return True
 
     @classmethod
     def _get_host(cls, host):
@@ -31,9 +50,13 @@ class Ssh(object):
         :param shell_script:  string
         :return: string
         """
+
+        if self.has_app() is False:
+            raise SshException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
+
         return self.SSH_COMMAND.format(*[
-            self.configuration["key_file"],
-            self.configuration["user"],
+            self.app.config[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
+            self.app.config[self.OPENSSH_CONFIGURATION][self.USER],
             self._get_host(host),
             shell_script
         ])

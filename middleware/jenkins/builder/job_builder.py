@@ -1,12 +1,13 @@
-from middleware.jenkins.builder.abstract_builder import AbstractBuilder
-from middleware.jenkins.builder.interface.builder_executor import BuilderExecutor
 from os import path
+from .abstract_builder import AbstractBuilder
+from .interfaces import BuilderInterface
 
 
-class JobBuilder(AbstractBuilder, BuilderExecutor):
+class JobBuilder(AbstractBuilder, BuilderInterface):
     """
-    Job Builder
+    Job Builder object
     """
+
     def process(self):
         """
         Process the abstract job
