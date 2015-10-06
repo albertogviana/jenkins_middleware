@@ -18,14 +18,14 @@ class Ssh(object):
 
     def init_app(self, app):
         self.app = app
-
-        if self.OPENSSH_CONFIGURATION not in self.app.config:
+        print(self.app)
+        if self.OPENSSH_CONFIGURATION not in self.app:
             raise SshException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
 
-        if self.USER not in self.app.config[self.OPENSSH_CONFIGURATION]:
+        if self.USER not in self.app[self.OPENSSH_CONFIGURATION]:
             raise SshException("User parameter is required for ssh.")
 
-        if self.KEY_FILE not in self.app.config[self.OPENSSH_CONFIGURATION]:
+        if self.KEY_FILE not in self.app[self.OPENSSH_CONFIGURATION]:
             raise SshException("Key file is required for ssh.")
 
     def has_app(self):
@@ -55,8 +55,8 @@ class Ssh(object):
             raise SshException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
 
         return self.SSH_COMMAND.format(*[
-            self.app.config[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
-            self.app.config[self.OPENSSH_CONFIGURATION][self.USER],
+            self.app[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
+            self.app[self.OPENSSH_CONFIGURATION][self.USER],
             self._get_host(host),
             shell_script
         ])

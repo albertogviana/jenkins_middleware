@@ -30,7 +30,7 @@ class Facade(object):
         :return:
         """
 
-        if json_data is None or len(json_data) <= 2:
+        if json_data is None or len(json_data) == 0:
             raise BadRequest(description="Invalid json.")
 
         self.jenkins_configuration = self.get_application_configuration(json_data["namespace"])

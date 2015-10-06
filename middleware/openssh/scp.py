@@ -21,13 +21,13 @@ class Scp(Openssh):
     def init_app(self, app):
         self.app = app
 
-        if self.OPENSSH_CONFIGURATION not in self.app.config:
+        if self.OPENSSH_CONFIGURATION not in self.app:
             raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
 
-        if self.USER not in self.app.config[self.OPENSSH_CONFIGURATION]:
+        if self.USER not in self.app[self.OPENSSH_CONFIGURATION]:
             raise ScpException("User parameter is required for ssh.")
 
-        if self.KEY_FILE not in self.app.config[self.OPENSSH_CONFIGURATION]:
+        if self.KEY_FILE not in self.app[self.OPENSSH_CONFIGURATION]:
             raise ScpException("Key file is required for ssh.")
 
     def has_app(self):
@@ -58,9 +58,9 @@ class Scp(Openssh):
 
         return self.SCP_COMMAND.format(*[
             self.connection_timeout,
-            self.app.config[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
+            self.app[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
             source,
-            self.app.config[self.OPENSSH_CONFIGURATION][self.USER],
+            self.app[self.OPENSSH_CONFIGURATION][self.USER],
             self._get_host(host),
             destination
         ])
