@@ -1,11 +1,9 @@
 from subprocess import Popen, PIPE
 from urllib.parse import urlparse
-
-from .interfaces import Openssh
 from .exceptions import ScpException
 
 
-class Scp(Openssh):
+class Scp(object):
     SCP_COMMAND = '/usr/bin/scp -o StrictHostKeyChecking=no -o ConnectTimeout={:d} -i {} -r {} {}@{}:{} 2>&1'
     OPENSSH_CONFIGURATION = "OPENSSH_CONFIGURATION"
     KEY_FILE = "key_file"
@@ -19,6 +17,11 @@ class Scp(Openssh):
             self.init_app(app)
 
     def init_app(self, app):
+        """
+        Initialize the class configuration
+        :param app:
+        :return:
+        """
         self.app = app
 
         if self.OPENSSH_CONFIGURATION not in self.app:
@@ -31,6 +34,10 @@ class Scp(Openssh):
             raise ScpException("Key file is required for scp.")
 
     def has_app(self):
+        """
+        Check if app was initialized
+        :return: boolean
+        """
         if self.app is None:
             return False
 

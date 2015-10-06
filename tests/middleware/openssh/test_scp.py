@@ -3,6 +3,8 @@ import pytest
 
 
 class TestScp(object):
+
+
     def test_scp_exception_user(self):
         with pytest.raises(Exception) as inst:
             Scp({"OPENSSH_CONFIGURATION": {}})
@@ -29,6 +31,12 @@ class TestScp(object):
         scp = Scp(self.get_data())
         command = scp._parse('/var/www', '/var/www/my-project', 'http://jenkins.backend.com/')
         assert result == command
+
+    def test_parse_exception_openssh_configuration(self):
+        scp = Scp(app=None)
+        with pytest.raises(Exception) as inst:
+            scp._parse('/var/www', '/var/www/my-project', 'http://jenkins.backend.com/')
+        assert str(inst.value) == "The OPENSSH_CONFIGURATION parameter was not found, it is required for scp."
 
     def test_execute_source_exception(self):
         scp = Scp(self.get_data())

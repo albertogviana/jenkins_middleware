@@ -2,7 +2,6 @@ import os
 from middleware.openssh.scp import Scp
 from middleware.openssh.ssh import Ssh
 from ..builder.interfaces import BuilderInterface
-from middleware.jenkins.jenkins_api import JenkinsApi
 
 
 class ScpCommand(object):

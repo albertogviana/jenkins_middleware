@@ -31,7 +31,13 @@ class TestSsh(object):
         command = ssh._parse('http://jenkins.backend.com/', execute_command)
         assert result == command
 
-    #
+    def test_parse_exception_openssh_configuration(self):
+        ssh = Ssh(app=None)
+        execute_command = r'"bash -c \"if [ ! -d {jenkins}/{folder} ]; then  mkdir -p {jenkins}/{folder}; fi\""'
+        with pytest.raises(Exception) as inst:
+            ssh._parse('http://jenkins.backend.com/', execute_command)
+        assert str(inst.value) == "The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh."
+
     def test_execute_host_exception(self):
         ssh = Ssh(self.get_data())
         with pytest.raises(Exception) as inst:
