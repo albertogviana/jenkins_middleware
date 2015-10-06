@@ -5,12 +5,12 @@ import pytest
 class TestScp(object):
     def test_scp_exception_user(self):
         with pytest.raises(Exception) as inst:
-            Scp({})
+            Scp({"OPENSSH_CONFIGURATION": {}})
         assert str(inst.value) == "User parameter is required for scp."
 
     def test_scp_exception_key_file(self):
         with pytest.raises(Exception) as inst:
-            Scp({"user": "user"})
+            Scp({"OPENSSH_CONFIGURATION": {"user": "user"}})
         assert str(inst.value) == "Key file is required for scp."
 
     def test_get_host_exception(self):
@@ -53,6 +53,8 @@ class TestScp(object):
     @classmethod
     def get_data(cls):
         return {
-            "user": "user",
-            "key_file": "test_file"
+            "OPENSSH_CONFIGURATION": {
+                "user": "user",
+                "key_file": "test_file"
+            }
         }

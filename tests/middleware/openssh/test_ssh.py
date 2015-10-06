@@ -5,12 +5,12 @@ import pytest
 class TestSsh(object):
     def test_ssh_exception_user(self):
         with pytest.raises(Exception) as inst:
-            Ssh({})
+            Ssh({"OPENSSH_CONFIGURATION":{}})
         assert str(inst.value) == "User parameter is required for ssh."
 
     def test_ssh_exception_key_file(self):
         with pytest.raises(Exception) as inst:
-            Ssh({"user": "user"})
+            Ssh({"OPENSSH_CONFIGURATION": {"user": "user"}})
         assert str(inst.value) == "Key file is required for ssh."
 
     def test_get_host_exception(self):
@@ -48,6 +48,8 @@ class TestSsh(object):
     @classmethod
     def get_data(cls):
         return {
-            "user": "user",
-            "key_file": "test_file"
+            "OPENSSH_CONFIGURATION": {
+                "user": "user",
+                "key_file": "test_file"
+            }
         }

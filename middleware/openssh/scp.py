@@ -22,13 +22,13 @@ class Scp(Openssh):
         self.app = app
 
         if self.OPENSSH_CONFIGURATION not in self.app:
-            raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
+            raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for scp.")
 
         if self.USER not in self.app[self.OPENSSH_CONFIGURATION]:
-            raise ScpException("User parameter is required for ssh.")
+            raise ScpException("User parameter is required for scp.")
 
         if self.KEY_FILE not in self.app[self.OPENSSH_CONFIGURATION]:
-            raise ScpException("Key file is required for ssh.")
+            raise ScpException("Key file is required for scp.")
 
     def has_app(self):
         if self.app is None:
