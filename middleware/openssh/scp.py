@@ -1,56 +1,17 @@
 from subprocess import Popen, PIPE
-from urllib.parse import urlparse
 from .exceptions import ScpException
+from .abstract_openssh import AbstractOpenSSH
 
 
-class Scp(object):
+class Scp(AbstractOpenSSH):
+    """
+    Implement in a simple way scp command
+    """
     SCP_COMMAND = '/usr/bin/scp -o StrictHostKeyChecking=no -o ConnectTimeout={:d} -i {} -r {} {}@{}:{} 2>&1'
-    OPENSSH_CONFIGURATION = "OPENSSH_CONFIGURATION"
-    KEY_FILE = "key_file"
-    USER = "user"
 
     def __init__(self, app=None, connection_timeout=10):
-        self.app = None
         self.connection_timeout = connection_timeout
-
-        if app is not None:
-            self.init_app(app)
-
-    def init_app(self, app):
-        """
-        Initialize the class configuration
-        :param app:
-        :return:
-        """
-        self.app = app
-
-        if self.OPENSSH_CONFIGURATION not in self.app:
-            raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for scp.")
-
-        if self.USER not in self.app[self.OPENSSH_CONFIGURATION]:
-            raise ScpException("User parameter is required for scp.")
-
-        if self.KEY_FILE not in self.app[self.OPENSSH_CONFIGURATION]:
-            raise ScpException("Key file is required for scp.")
-
-    def has_app(self):
-        """
-        Check if app was initialized
-        :return: boolean
-        """
-        if self.app is None:
-            return False
-
-        return True
-
-    @classmethod
-    def _get_host(cls, host):
-        hostname = urlparse(host)
-
-        if hostname.netloc is "":
-            raise ScpException("The host " + host + " informed is not valid for scp.")
-
-        return hostname.netloc
+        self.init_app(app)
 
     def _parse(self, source, destination, host):
         """

@@ -6,18 +6,18 @@ class TestSsh(object):
     def test_ssh_exception_user(self):
         with pytest.raises(Exception) as inst:
             Ssh({"OPENSSH_CONFIGURATION":{}})
-        assert str(inst.value) == "User parameter is required for ssh."
+        assert str(inst.value) == "User parameter is required for openssh."
 
     def test_ssh_exception_key_file(self):
         with pytest.raises(Exception) as inst:
             Ssh({"OPENSSH_CONFIGURATION": {"user": "user"}})
-        assert str(inst.value) == "Key file is required for ssh."
+        assert str(inst.value) == "Key file is required for openssh."
 
     def test_get_host_exception(self):
         ssh = Ssh(self.get_data())
         with pytest.raises(Exception) as inst:
             ssh._get_host("abcde123445")
-        assert str(inst.value) == "The host abcde123445 informed is not valid for ssh."
+        assert str(inst.value) == "The host abcde123445 informed is not valid for openssh."
 
     def test_get_host(self):
         ssh = Ssh(self.get_data())

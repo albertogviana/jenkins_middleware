@@ -4,22 +4,27 @@ import pytest
 
 class TestScp(object):
 
+    def test_scp_exception(self):
+        scp = Scp(None)
+        with pytest.raises(Exception) as inst:
+            scp.init_app({})
+        assert str(inst.value) == "The OPENSSH_CONFIGURATION parameter was not found, it is required for openssh."
 
     def test_scp_exception_user(self):
         with pytest.raises(Exception) as inst:
             Scp({"OPENSSH_CONFIGURATION": {}})
-        assert str(inst.value) == "User parameter is required for scp."
+        assert str(inst.value) == "User parameter is required for openssh."
 
     def test_scp_exception_key_file(self):
         with pytest.raises(Exception) as inst:
             Scp({"OPENSSH_CONFIGURATION": {"user": "user"}})
-        assert str(inst.value) == "Key file is required for scp."
+        assert str(inst.value) == "Key file is required for openssh."
 
     def test_get_host_exception(self):
         scp = Scp(self.get_data())
         with pytest.raises(Exception) as inst:
             scp._get_host("abcde123445")
-        assert str(inst.value) == "The host abcde123445 informed is not valid for scp."
+        assert str(inst.value) == "The host abcde123445 informed is not valid for openssh."
 
     def test_get_host(self):
         scp = Scp(self.get_data())
