@@ -1,4 +1,4 @@
-from ..parser.interface.parser import InterfaceParser
+from middleware.jenkins.parser.interfaces import InterfaceParser
 
 
 class AbstractBuilderInterface(object):

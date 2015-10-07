@@ -2,7 +2,7 @@ from subprocess import Popen, PIPE
 from json.encoder import JSONEncoder
 
 from .interfaces import AbstractBuilderInterface
-from ..parser.interface.parser import InterfaceParser
+from middleware.jenkins.parser.interfaces import InterfaceParser
 from middleware.gitlab.download import Download
 from os import path
 import tarfile

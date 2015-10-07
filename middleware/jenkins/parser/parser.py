@@ -1,4 +1,4 @@
-from middleware.jenkins.parser.interface.parser import InterfaceParser
+from middleware.jenkins.parser.interfaces import InterfaceParser
 
 
 class Parser(InterfaceParser):
