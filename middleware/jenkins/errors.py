@@ -34,6 +34,17 @@ def method_not_supported(exception):
     return response
 
 
+@api_jenkins.app_errorhandler(422)
+def unprocessable_entity(exception):
+    """
+    Internal Server Error json response
+    """
+    response = jsonify({'status': 422, 'error': 'unprocessable entity',
+                        'message': exception.description})
+    response.status_code = 422
+    return response
+
+
 @api_jenkins.app_errorhandler(500)  # this has to be an app-wide handler
 def internal_server_error(exception):
     """

@@ -8,6 +8,9 @@ class Parser(InterfaceParser):
     JOB_KEY = 'job'
     JOB_NOT_FOUND = 'Job field was not found.'
 
+    VIEW_KEY = 'view'
+    VIEW_NOT_FOUND = 'View field was not found.'
+
     PLACEHOLDER_KEY = 'placeholder'
     PLACEHOLDER_NOT_FOUND = 'Placeholder field was not found.'
 
@@ -46,6 +49,29 @@ class Parser(InterfaceParser):
             raise Exception(job_parameter_name + " field was not found.")
 
         return self.__json_data[self.JOB_KEY][job_parameter_name]
+
+    def _has_view(self):
+        """
+        Check if the field job exists
+        :return: boolean
+        """
+        if self.VIEW_KEY in self.__json_data:
+            return True
+        return False
+
+    def get_view_parameter(self, view_parameter_name):
+        """
+        Get a field
+        :param view_parameter_name: string
+        :return: string
+        """
+        if self._has_view() is False:
+            raise Exception(self.VIEW_NOT_FOUND)
+
+        if view_parameter_name not in self.__json_data[self.VIEW_KEY]:
+            raise Exception(view_parameter_name + " field was not found.")
+
+        return self.__json_data[self.VIEW_KEY][view_parameter_name]
 
     def get_name(self):
         """

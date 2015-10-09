@@ -55,9 +55,7 @@ class Download(InterfaceGitlab):
         response = requests.get(host, stream=True)
 
         if response.status_code != 200:
-            raise Exception(
-                "It was not find the abstract job " + abstract_name + " in gitlab."
-            )
+            raise Exception("It was not find the abstract job " + abstract_name + " in gitlab.")
 
         with open(abstract_job_file, 'wb') as handle:
             for chunk in response.iter_content(chunk_size=1024):

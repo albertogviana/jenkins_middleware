@@ -12,8 +12,14 @@ class PipelineCommand(object):
 
     def execute(self, pipeline: Pipeline):
         self._handle_job(pipeline)
+        self._handle_view(pipeline)
 
     def _handle_job(self, pipeline: Pipeline):
         for item in pipeline.jobs:
             self.jenkins_api.handle_job(item.get_name(), item.get_config_xml())
+            self.scp_command.execute(item, self.jenkins_api, self.jenkins_api.server)
+
+    def _handle_view(self, pipeline: Pipeline):
+        for item in pipeline.views:
+            self.jenkins_api.handle_view(item.get_name(), item.get_config_xml())
             self.scp_command.execute(item, self.jenkins_api, self.jenkins_api.server)
