@@ -59,6 +59,7 @@ class Facade(object):
         """
         download = self.get_download_instance()
         for job_data in jobs_data['jobs']:
+            print(job_data)
             job_parser = Parser(job_data)
             job = JobBuilder(job_parser, download)
             job.process()

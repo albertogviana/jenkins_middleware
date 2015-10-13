@@ -54,4 +54,4 @@ class Scp(AbstractOpenSSH):
         output = process.communicate()
 
         if process.returncode == 1:
-            raise Exception(output.decode('utf-8'))
+            raise Exception(output)

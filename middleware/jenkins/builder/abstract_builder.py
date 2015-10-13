@@ -74,7 +74,7 @@ class AbstractBuilder(AbstractBuilderInterface, BuilderInterface):
         output = process.communicate()
 
         if process.returncode == 1:
-            raise Exception(output.decode('utf-8'))
+            raise Exception(output)
 
     @classmethod
     def get_file_content(cls, file):
