@@ -5,7 +5,6 @@ from middleware.jenkins.builder.job_builder import JobBuilder
 from middleware.jenkins.parser.parser import Parser
 from middleware.gitlab.download import Download
 from unittest.mock import Mock
-import pytest
 
 
 class TestJobBuilder(object):
