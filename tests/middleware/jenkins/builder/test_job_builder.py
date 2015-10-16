@@ -5,6 +5,7 @@ from middleware.jenkins.builder.job_builder import JobBuilder
 from middleware.jenkins.parser.parser import Parser
 from middleware.gitlab.download import Download
 from unittest.mock import Mock
+import pytest
 
 
 class TestJobBuilder(object):
@@ -29,11 +30,34 @@ class TestJobBuilder(object):
 
         job = JobBuilder(parser, download)
 
-        directory = self.prepare_fixture(parser.get_name(), parser.get_abstract_name())
+        directory = self.prepare_fixture(parser.get_name())
         job.extract_package(os.path.join(directory, self.FILENAME))
 
         assert os.path.isdir(os.path.join(self.directory, parser.get_abstract_name() + ".git")) is True
         self.remove_fixture()
+
+    def test_extract_package_exception(self):
+        parser = Parser(self._get_parser_data())
+        download = Download(self.get_git_download_data())
+
+        job = JobBuilder(parser, download)
+
+        with pytest.raises(Exception) as inst:
+            job.extract_package(os.path.join('/tmp', self.FILENAME))
+        assert str(inst.value) == "It was not possible to extract the package because the file /tmp/build-composer-cc2632fae2cab2f73ce6e6607d9b0befec0b82a1.tar.gz doesn't exists."
+
+    def test_pre_process_configuration(self):
+        parser = Parser(self._get_parser_data())
+        download = Download(self.get_git_download_data())
+
+        job = JobBuilder(parser, download)
+
+        directory = self.prepare_fixture(parser.get_name())
+        folder = job.extract_package(os.path.join(directory, self.FILENAME))
+
+        job.pre_process_configuration(folder)
+
+        assert os.path.isfile(os.path.join(self.directory, parser.get_abstract_name() + ".git/output.xml")) is True
 
     @classmethod
     def _get_parser_data(cls):
@@ -59,7 +83,7 @@ class TestJobBuilder(object):
             "download_path": "web-jenkins-jobs/{}/repository/archive.tar.gz?ref={}"
         }
 
-    def prepare_fixture(self, job_name, abstract_name, file_extension=".git"):
+    def prepare_fixture(self, job_name):
         directory = os.path.join(tempfile.gettempdir(), job_name) + '%s' % time.time()
 
         if os.path.exists(directory) is False:

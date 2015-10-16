@@ -49,12 +49,16 @@ class AbstractBuilder(AbstractBuilderInterface, BuilderInterface):
         :param compress_file:
         :return: folder path
         """
+
+        if path.isfile(compress_file) is False:
+                raise Exception("It was not possible to extract the package because the file " + compress_file + " doesn't exists.")
+
         try:
             directory = path.dirname(compress_file)
             tar = tarfile.open(compress_file)
             tar.extractall(path=directory)
         except Exception as inst:
-            raise Exception(inst)
+            raise Exception(inst.args)
         finally:
             tar.close()
 
