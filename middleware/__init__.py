@@ -1,17 +1,23 @@
-from flask import Flask, make_response
-from flask_restful import Api
-from flask.json import jsonify
-from middleware.jenkins.controllers import Controllers
+from flask import Flask
+from flask_sqlalchemy import SQLAlchemy
+from config import configuration
+
+db = SQLAlchemy()
 
 
-app = Flask(__name__)
-api = Api(app)
+def create_app():
+    """Create an application instance."""
+    app = Flask(__name__)
 
-api.add_resource(Controllers, '/pipeline')
+    # apply configuration
+    app.config.from_object(configuration)
+    app.config.from_object('config')
 
-"""
-Error 404 is returning a json
-"""
-@app.errorhandler(404)
-def not_found(error):
-    return make_response(jsonify({'error': 'Not found'}), 404)
+    # initialize database
+    db.init_app(app)
+
+    # register blueprints
+    from .jenkins import api_jenkins as api_jenkins_blueprint
+    app.register_blueprint(api_jenkins_blueprint, url_prefix='/api/jenkins')
+
+    return app
