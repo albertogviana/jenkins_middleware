@@ -1,28 +1,16 @@
 from subprocess import Popen, PIPE
-from urllib.parse import urlparse
-from middleware.openssh.exception.openssh_exception import SshException
+from .exceptions import SshException
+from .abstract_openssh import AbstractOpenSSH
 
 
-class Ssh(object):
+class Ssh(AbstractOpenSSH):
+    """
+    Implement in a simple way ssh command
+    """
     SSH_COMMAND = "/usr/bin/ssh -i {} -o StrictHostKeyChecking=no {}@{} {}"
 
-    def __init__(self, configuration: {}):
-        self.configuration = configuration
-
-        if "user" not in self.configuration:
-            raise SshException("User parameter is required for ssh.")
-
-        if "key_file" not in self.configuration:
-            raise SshException("Key file is required for ssh.")
-
-    @classmethod
-    def _get_host(cls, host):
-        hostname = urlparse(host)
-
-        if hostname.netloc is "":
-            raise SshException("The host " + host + " informed is not valid for ssh.")
-
-        return hostname.netloc
+    def __init__(self, app=None):
+        self.init_app(app)
 
     def _parse(self, host, shell_script):
         """
@@ -31,9 +19,13 @@ class Ssh(object):
         :param shell_script:  string
         :return: string
         """
+
+        if self.has_app() is False:
+            raise SshException("The OPENSSH_CONFIGURATION parameter was not found, it is required for ssh.")
+
         return self.SSH_COMMAND.format(*[
-            self.configuration["key_file"],
-            self.configuration["user"],
+            self.app[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
+            self.app[self.OPENSSH_CONFIGURATION][self.USER],
             self._get_host(host),
             shell_script
         ])
@@ -51,9 +43,8 @@ class Ssh(object):
             raise SshException("The shell script parameter could not be empty on ssh.")
 
         command = self._parse(host, shell_script)
-        print(command)
         process = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
         output = process.communicate()
 
         if process.returncode == 1:
-            raise Exception(output.decode('utf-8'))
+            raise Exception(output)

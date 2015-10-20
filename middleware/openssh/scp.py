@@ -1,30 +1,17 @@
 from subprocess import Popen, PIPE
-from urllib.parse import urlparse
-from middleware.openssh.interface.openssh import Openssh
-from middleware.openssh.exception.openssh_exception import ScpException
+from .exceptions import ScpException
+from .abstract_openssh import AbstractOpenSSH
 
 
-class Scp(Openssh):
+class Scp(AbstractOpenSSH):
+    """
+    Implement in a simple way scp command
+    """
     SCP_COMMAND = '/usr/bin/scp -o StrictHostKeyChecking=no -o ConnectTimeout={:d} -i {} -r {} {}@{}:{} 2>&1'
 
-    def __init__(self, configuration: {}, connection_timeout=10):
+    def __init__(self, app=None, connection_timeout=10):
         self.connection_timeout = connection_timeout
-        self.configuration = configuration
-
-        if "user" not in self.configuration:
-            raise ScpException("User parameter is required for scp.")
-
-        if "key_file" not in self.configuration:
-            raise ScpException("Key file is required for scp.")
-
-    @classmethod
-    def _get_host(cls, host):
-        hostname = urlparse(host)
-
-        if hostname.netloc is "":
-            raise ScpException("The host " + host + " informed is not valid for scp.")
-
-        return hostname.netloc
+        self.init_app(app)
 
     def _parse(self, source, destination, host):
         """
@@ -34,11 +21,14 @@ class Scp(Openssh):
         :param host:  string
         :return: string
         """
+        if self.has_app() is False:
+            raise ScpException("The OPENSSH_CONFIGURATION parameter was not found, it is required for scp.")
+
         return self.SCP_COMMAND.format(*[
             self.connection_timeout,
-            self.configuration["key_file"],
+            self.app[self.OPENSSH_CONFIGURATION][self.KEY_FILE],
             source,
-            self.configuration["user"],
+            self.app[self.OPENSSH_CONFIGURATION][self.USER],
             self._get_host(host),
             destination
         ])
@@ -60,9 +50,8 @@ class Scp(Openssh):
             raise ScpException("The host parameter could not be empty on scp.")
 
         command = self._parse(source, destination, host)
-        print(command)
         process = Popen(command, stdout=PIPE, stderr=PIPE, shell=True)
         output = process.communicate()
 
         if process.returncode == 1:
-            raise Exception(output.decode('utf-8'))
+            raise Exception(output)
