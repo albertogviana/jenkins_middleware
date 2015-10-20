@@ -1,5 +1,6 @@
 Flask
 Flask-RESTful
 Flask-SQLAlchemy
+Flask-Script
 python-jenkins
 requests
