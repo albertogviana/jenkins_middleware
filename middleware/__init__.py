@@ -1,6 +1,5 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
-from config import configuration
 
 db = SQLAlchemy()
 
@@ -10,7 +9,6 @@ def create_app():
     app = Flask(__name__)
 
     # apply configuration
-    app.config.from_object(configuration)
     app.config.from_object('config')
 
     # initialize database
