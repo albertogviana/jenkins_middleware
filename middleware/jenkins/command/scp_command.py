@@ -26,6 +26,13 @@ class ScpCommand(object):
         self.scp.init_app(self.app)
 
     def execute(self, item: BuilderInterface, jenkins_api, server):
+        """
+        Move files to jenkins server
+        :param item:
+        :param jenkins_api:
+        :param server:
+        :return:
+        """
         jenkins_folder = jenkins_api.get_jenkins_home()
         ggs_job_folder = self.GGS_JOBS_FOLDER + '/' + item.get_name()
         command = self.SSH_COMMAND.format(jenkins=jenkins_folder, folder=ggs_job_folder)
