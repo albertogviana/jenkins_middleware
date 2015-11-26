@@ -11,8 +11,8 @@ class Parser(object):
     def get_repository_namespace(self):
         repository_name = ''
         if "repository" in self.__json_data and "homepage" in self.__json_data["repository"]:
-            repository = self.__json_data["repository"]["homepage"].split("/")
-            repository_name = repository.pop()
+            match = re.match("[^:]*:([^/]*).*", self.__json_data["repository"]["url"])
+            repository_name = match.group(1)
         return repository_name
 
     def get_repository_url(self):
@@ -25,7 +25,7 @@ class Parser(object):
         branch_name = ''
         if "ref" not in self.__json_data:
             return branch_name
-        branch_name = re.match("refs/heads/([A-Za-z0-9_-]*)", self.__json_data["ref"])
+        branch_name = re.match("refs/heads/(.*)", self.__json_data["ref"])
         return branch_name.group(1)
 
     def get_project_name(self):

@@ -29,6 +29,6 @@ class JenkinsApi(PythonJenkins):
 
         return response["monitorData"]["hudson.node_monitors.DiskSpaceMonitor"]["path"]
 
-    def run_job(self, name, token=None):
+    def run_job(self, name, token=None, parameters=None):
         if self.job_exists(name) is True:
-            self.build_job(name, token=token)
+            self.build_job(name, token=token, parameters=parameters)

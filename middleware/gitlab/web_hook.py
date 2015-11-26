@@ -11,8 +11,8 @@ class WebHook(object):
     branch_pattern = {
         "master": "master",
         "develop": "develop",
-        "feature": "(feature-)([a-zA-Z\-0-9]*)",
-        "release": "(hotfix-|release-)([a-zA-Z\-0-9]*)"
+        "feature": "feature[-/]{1}",
+        "release": "(hotfix|release)[-/]{1}"
     }
 
     def __init__(self, app, logger):
@@ -47,8 +47,8 @@ class WebHook(object):
             )
 
             job_name = self.get_job_name(repository_namespace, repository_project_name, pipeline_type)
-
-            self.jenkins_server.run_job(job_name, configuration.token)
+            parameters = {"branchName": branch_name}
+            self.jenkins_server.run_job(job_name, configuration.token, parameters)
 
             return ''
         except Exception as inst:
