@@ -11,6 +11,15 @@ def bad_request(exception):
     response.status_code = 400
     return response
 
+@api_jenkins.app_errorhandler(403)
+def forbidden(exception):
+    """
+    Internal Server Error json response
+    """
+    response = jsonify({'status': 403, 'error': 'forbidden',
+                        'message': exception.description})
+    response.status_code = 403
+    return response
 
 @api_jenkins.app_errorhandler(404)  # this has to be an app-wide handler
 def not_found(exception):
