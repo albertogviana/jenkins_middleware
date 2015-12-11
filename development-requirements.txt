@@ -1,13 +1,6 @@
-Flask
-Flask-RESTful
-Flask-SQLAlchemy
-Flask-Script
-python-jenkins
-requests
 pytest
 pytest-mock
 pytest-cov
 httpretty
 coverage
 pylint
-tornado

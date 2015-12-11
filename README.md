@@ -20,17 +20,17 @@ virtualenv flask
 
 ## Install dependencies
 
-### Development environment
+### Development modules
 ```
 flask/bin/pip install -r development-requirements.txt
 ```
-### Production environment
+### Production modules
 ```
 flask/bin/pip install -r requirements.txt
 ```
 ## Starting the server
 ```
-flask/bin/python3.4 manage.py runserver
+flask/bin/python3.4 app.py
 ```
 
 ## Running Tests
@@ -41,3 +41,4 @@ flask/bin/py.test tests/
 With code coverage
 ```
 flask/bin/py.test --cov=middleware --cov-report=html tests/ -q -s
+```
