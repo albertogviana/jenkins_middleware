@@ -1,11 +1,23 @@
+import ssl
+import socket
+
 from jenkins import Jenkins as PythonJenkins
 from jenkins import JenkinsException
+from six.moves.urllib.request import HTTPSHandler, install_opener, build_opener
 
 
 class JenkinsApi(PythonJenkins):
     """
     Class to handle Jenkins integration
     """
+
+    def __init__(self, url, username=None, password=None, timeout=socket._GLOBAL_DEFAULT_TIMEOUT):
+        super().__init__(url, username, password, timeout)
+
+        # Setting ssl key verificationas false
+        context = ssl._create_stdlib_context(check_hostname=False)
+        unverified_handler = HTTPSHandler(context=context, check_hostname=False)
+        install_opener(build_opener(unverified_handler))
 
     def handle_job(self, name, config_xml):
         if self.job_exists(name) is True:

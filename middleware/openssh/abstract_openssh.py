@@ -47,4 +47,4 @@ class AbstractOpenSSH(object):
         if hostname.netloc is "":
             raise OpensshException("The host " + host + " informed is not valid for openssh.")
 
-        return hostname.netloc
+        return hostname.hostname
